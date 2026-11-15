@@ -220,7 +220,12 @@
     "verify-official-bundle-catalog": "tsx scripts/gen-official-bundle-catalog.ts --check",
     "gen-provider-data": "tsx packages/llm/llm-pi-ai/scripts/gen-provider-data.ts",
     "verify-provider-data": "tsx packages/llm/llm-pi-ai/scripts/gen-provider-data.ts --check",
-    "verify-product-use": "tsx scripts/verify-product-use.ts"
+    "verify-product-use": "tsx scripts/verify-product-use.ts",
+    "docker:build": "node docker/compose.mjs build",
+    "docker:up": "node docker/compose.mjs up --detach --no-build --pull never",
+    "docker:down": "node docker/compose.mjs down",
+    "docker:logs": "node docker/compose.mjs logs --follow deepseek-harness",
+    "docker:check": "node --test docker/integration.test.mjs docker/dsh-explorer.test.cjs docker/dsh-web-relay.test.cjs"
   },
   "devDependencies": {
     "@deepseek-ai/dsh-hooks-claude-code": "workspace:*",

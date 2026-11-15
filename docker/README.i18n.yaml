@@ -1,0 +1,25 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write docker/README.md
+/docker-from-local-source:
+  en: 8c3b390e7401196a
+  zh: 8f977b6c29ec4cdb
+/docker-from-local-source/summary:
+  en: e5d73a4dc564f71d
+  zh: 4fa436d2b5fc72a5
+/docker-from-local-source/table-of-contents:
+  en: c41a76675b6def7a
+  zh: e9a1cd6400b8164f
+/docker-from-local-source/build-and-start:
+  en: 3613ec0126eb756b
+  zh: deaa527ee94d465e
+/docker-from-local-source/data-and-ports:
+  en: 2b3cad5165e30b8d
+  zh: 7d4b7ef6f419c194
+/docker-from-local-source/build-and-verification:
+  en: 540bb4f8c1db34d6
+  zh: d5e247c159ae364a
+/docker-from-local-source/dev-note:
+  en: f5c5e9f576b6cc00
+  zh: 704537d588d5dc16
