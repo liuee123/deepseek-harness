@@ -25,8 +25,9 @@ RUN test -n "${DSH_CLIENT_COMMIT_HASH}" || \
     { echo 'Use pnpm docker:build, or pass --build-arg DSH_CLIENT_COMMIT_HASH=<git-commit>' >&2; exit 1; }
 RUN --mount=type=cache,target=/pnpm/store \
     pnpm install --frozen-lockfile --store-dir=/pnpm/store
-RUN pnpm run build:artifacts \
-    && pnpm run build:check
+RUN pnpm run build:artifacts
+ARG DSH_CHECK_CONCURRENCY=1
+RUN DSH_GATE_CONCURRENCY=${DSH_CHECK_CONCURRENCY} pnpm run build:check
 RUN --mount=type=cache,target=/pnpm/store \
     DSH_DOCKER_BUILD=1 PNPM_CONFIG_STORE_DIR=/pnpm/store node docker/deploy.mjs
 

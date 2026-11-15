@@ -56,13 +56,21 @@ The root filesystem is read-only, with writable volumes and `/tmp`. Chromium run
 
 The build uses the root package manager declaration and frozen dependency lockfile, then runs `build:artifacts` and `build:check`. Production deployment uses the repository's legacy pnpm deployment helpers and the populated dependency store. Only the builder's CLI manifest gains local Browser Use dependencies; the checked-in manifest and lockfile remain unchanged. The final image includes the deployed runtime, browser, desktop and container adapters; host `node_modules`, compiled outputs, Git data and environment files are excluded from the build context.
 
-`DSH_BUILD_CONCURRENCY` sets the build scheduler's worker count, defaulting to 2. `DSH_IMAGE` selects the local image tag, defaulting to `deepseek-harness:local`. The community desktop plugin and adapters are copied under this directory with their license notices; they do not require the sibling Docker repository at build time.
+`DSH_BUILD_CONCURRENCY` sets the artifact build's worker count, defaulting to 2. `DSH_CHECK_CONCURRENCY` sets the aggregate type checks' worker count, defaulting to 1 so the Host and Client checks run sequentially. Each check can use a large Node.js heap; sequential checks reduce simultaneous memory use but do not limit one process. The checks occupy a separate Docker layer, so changing only their concurrency preserves the artifact build's cache. Set these variables in the host environment or root `.env`; setting `DSH_GATE_CONCURRENCY` in the host shell does not forward it into the image build.
+
+On memory-constrained Docker hosts, use one worker for both phases:
+
+```sh
+DSH_BUILD_CONCURRENCY=1 DSH_CHECK_CONCURRENCY=1 pnpm docker:build
+```
+
+The check runner prints completion or failure after a check settles; a quiet interval alone does not establish a hang. `DSH_IMAGE` selects the local image tag, defaulting to `deepseek-harness:local`. The community desktop plugin and adapters are copied under this directory with their license notices; they do not require the sibling Docker repository at build time.
 
 ```sh
 pnpm docker:check
 ```
 
-Path parsing and deployment metadata have local tests. Linux relay tests cover TCP forwarding; Windows cannot report the same POSIX signal result. During image construction, a separate check launches Xvfb, invokes `explorer.exe`, and waits for the configuration editor window. Compose checks the Web authentication response, noVNC page and Chromium debugging endpoint. Image construction and runtime checks require a Docker host; they have not been executed in the authoring environment.
+Path parsing and deployment metadata have local tests. Linux relay tests cover TCP forwarding; Windows cannot report the same POSIX signal result. During image construction, a separate check launches Xvfb, invokes `explorer.exe`, and waits for the configuration editor window. Compose checks the Web authentication response, noVNC page and Chromium debugging endpoint. Image construction and runtime checks require a Docker host.
 
 <a id="dev-note"></a>
 

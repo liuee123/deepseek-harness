@@ -10,6 +10,7 @@ services:
         IMAGE_REVISION: ${DSH_CLIENT_COMMIT_HASH:-unknown}
         NODE_IMAGE: ${NODE_IMAGE:-docker.io/library/node:24-trixie}
         DSH_BUILD_CONCURRENCY: ${DSH_BUILD_CONCURRENCY:-2}
+        DSH_CHECK_CONCURRENCY: ${DSH_CHECK_CONCURRENCY:-1}
     image: ${DSH_IMAGE:-deepseek-harness:local}
     ports:
       - "127.0.0.1:${DSH_PORT:-3080}:3080"

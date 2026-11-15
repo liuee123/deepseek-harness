@@ -56,13 +56,21 @@ Compose 项目名为 `deepseek-harness-source`，使用与社区镜像部署分�
 
 构建使用根包声明的包管理器和冻结的依赖锁文件，随后运行 `build:artifacts` 与 `build:check`。生产部署复用仓库的 pnpm 旧版部署辅助函数和已填充的依赖存储。仅构建容器中的 CLI 清单会加入本地 Browser Use 依赖；检入仓库的清单和锁文件保持不变。最终镜像包含部署后的运行产物、浏览器、桌面和容器适配脚本；宿主 `node_modules`、编译产物、Git 数据和环境文件均从构建上下文排除。
 
-`DSH_BUILD_CONCURRENCY` 设置构建调度器的并发任务数，默认为 2。`DSH_IMAGE` 选择本地镜像标签，默认为 `deepseek-harness:local`。社区桌面插件和适配脚本连同许可证声明一起复制在此目录中；构建不依赖旁边的 Docker 仓库。
+`DSH_BUILD_CONCURRENCY` 设置产物构建的并发任务数，默认为 2。`DSH_CHECK_CONCURRENCY` 设置聚合类型检查的并发任务数，默认为 1，使 Host 与 Client 检查依次运行。每项检查都可能使用较大的 Node.js 堆；串行检查可降低同时占用的内存，但不限制单个进程。类型检查位于独立的 Docker 层，因此仅修改检查并发时可复用产物构建缓存。请在宿主环境或根目录 `.env` 中设置这些变量；仅在宿主 Shell 设置 `DSH_GATE_CONCURRENCY` 不会将其传入镜像构建。
+
+Docker 主机内存有限时，两个阶段均使用单个任务：
+
+```sh
+DSH_BUILD_CONCURRENCY=1 DSH_CHECK_CONCURRENCY=1 pnpm docker:build
+```
+
+检查运行器会在一项检查结束后输出完成或失败信息；仅凭一段时间没有日志，不能判定检查卡死。`DSH_IMAGE` 选择本地镜像标签，默认为 `deepseek-harness:local`。社区桌面插件和适配脚本连同许可证声明一起复制在此目录中；构建不依赖旁边的 Docker 仓库。
 
 ```sh
 pnpm docker:check
 ```
 
-路径解析和部署元数据有本地测试。Linux 中继测试覆盖 TCP 转发；Windows 无法报告相同的 POSIX 信号结果。镜像构建期间，独立检查会启动 Xvfb、调用 `explorer.exe`，并等待配置编辑器窗口出现。Compose 检查 Web 认证响应、noVNC 页面和 Chromium 调试端点。镜像构建和运行检查需要 Docker 主机，尚未在本次编写环境执行。
+路径解析和部署元数据有本地测试。Linux 中继测试覆盖 TCP 转发；Windows 无法报告相同的 POSIX 信号结果。镜像构建期间，独立检查会启动 Xvfb、调用 `explorer.exe`，并等待配置编辑器窗口出现。Compose 检查 Web 认证响应、noVNC 页面和 Chromium 调试端点。镜像构建和运行检查需要 Docker 主机。
 
 <a id="dev-note"></a>
 
